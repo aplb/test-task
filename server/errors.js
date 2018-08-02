@@ -16,7 +16,17 @@ class EntityNotFoundError extends Error {
   }
 }
 
+class NegativeAmountError extends Error {
+  constructor(message) {
+    super();
+    this.type = 'AppError';
+    this.name = 'NegativeAmountError';
+    this.message = message;
+  }
+}
+
 module.exports = {
   DatabaseError,
   EntityNotFoundError,
+  NegativeAmountError,
 };

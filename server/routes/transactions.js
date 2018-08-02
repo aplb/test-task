@@ -6,10 +6,11 @@ const shouldRespond = require('../middlewares/shouldRespond');
 const {
   getAllTransactions,
   getSingleTransaction,
-  // createTransaction,
+  createTransaction,
   // deleteTransaction,
 } = require('../db');
 const {
+  createTransaction: createTransactionSchema,
   getSingleTransaction: getSingleTransactionSchema,
   options,
 } = require('../validations/transactionSchema');
@@ -48,9 +49,23 @@ module.exports = function(app) {
     conditional(shouldRespond, sendResponse)
   );
 
-  app.post('/transaction', async (req, res) => {
-    res.json({ msg: 'create TR' });
-  });
+  app.post(
+    '/transaction',
+    celebrate({ body: createTransactionSchema }, options),
+    // checkNegativeAmount
+    async (req, res, next) => {
+      const payload = req.body;
+      try {
+        const transact = await createTransaction(payload);
+        req.state.toRespond = { result: transact, status: 201 };
+        next();
+      } catch (err) {
+        next(err, req, res);
+      }
+    },
+    conditional(shouldRespond, sendResponse)
+  );
+
   app.delete('/transaction/:id', async (req, res) => {
     res.json({ msg: 'DEL ONE TR' });
   });

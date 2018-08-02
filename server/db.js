@@ -19,15 +19,17 @@ const getSingleTransaction = id => {
 };
 
 const createTransaction = payload => {
+  // withLock
   const transact = Object.assign(
     {},
     {
       id: uuid(),
-      effectiveDate: Date.now(),
+      effectiveDate: new Date(),
     },
     payload
   );
   data[transact.id] = transact;
+  // unlock
   return Promise.resolve(transact);
 };
 
