@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const expressWinston = require('express-winston');
 const { server } = require('config');
 const errorHandler = require('./middlewares/errorHandler');
+const logger = require('./logger');
 
 const app = express();
 app.use(bodyParser.json());
@@ -11,6 +13,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(
+  expressWinston.logger({
+    winstonInstance: logger,
+  })
+);
+
 require('./routes/transactions')(app);
 // require('./routes/account')(app);
 
@@ -18,10 +26,21 @@ app.get('/', (req, res) => {
   res.json({ ok: true });
 });
 
-// add notFound & errorHandler
+app.use(
+  expressWinston.errorLogger({
+    winstonInstance: logger,
+    exceptionToMeta: function(error) {
+      return {
+        stack: error.stack && error.stack.split('\n'),
+      };
+    },
+  })
+);
+
+// add notFound
 
 app.use(errorHandler);
 
 app.listen(server.port, () => {
-  // console.log('----------', 'app listening');
+  logger.info(`App listening on port: ${server.port}.....`, { tags: 'server' });
 });

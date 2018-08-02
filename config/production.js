@@ -1,5 +1,5 @@
 module.exports = {
   logs: {
-    logConsoleLevel: 'silly',
+    logConsoleLevel: 'info',
   },
 };
