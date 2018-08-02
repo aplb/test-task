@@ -1,0 +1,22 @@
+{
+  "parser": "babel-eslint",
+  "root": true,
+  "extends": [
+    "airbnb",
+    "eslint:recommended",
+    "prettier"
+  ],
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true,
+  },
+  "plugins": ["eslint-plugin", "node", "prettier"],
+  "parserOptions": {
+      "ecmaVersion": 2017,
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "node/no-unsupported-features": "error",
+  },
+}
