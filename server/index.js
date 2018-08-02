@@ -41,6 +41,12 @@ app.use(
 
 app.use(errorHandler);
 
+process.on('uncaughtException', err => {
+  logger.error(err.message);
+  logger.error(err.stack);
+  process.exit(100);
+});
+
 app.listen(server.port, () => {
   logger.info(`App listening on port: ${server.port}.....`, { tags: 'server' });
 });
