@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const { server } = require('config');
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,6 +13,6 @@ app.get('/', (req, res) => {
 
 // add notFound & errorHandler
 
-app.listen(3000, () => {
+app.listen(server.port, () => {
   // console.log('----------', 'app listening');
 });
