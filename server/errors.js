@@ -7,6 +7,15 @@ class DatabaseError extends Error {
   }
 }
 
+class DatabaseNotFoundError extends Error {
+  constructor(message) {
+    super();
+    this.type = 'AppError';
+    this.name = 'DatabaseNotFoundError';
+    this.message = message;
+  }
+}
+
 class EntityNotFoundError extends Error {
   constructor(message) {
     super();
@@ -27,6 +36,7 @@ class NegativeAmountError extends Error {
 
 module.exports = {
   DatabaseError,
+  DatabaseNotFoundError,
   EntityNotFoundError,
   NegativeAmountError,
 };

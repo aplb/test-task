@@ -1,5 +1,5 @@
 const uuid = require('uuid/v4');
-const { DatabaseError } = require('./errors');
+const { DatabaseNotFoundError } = require('./errors');
 const seed = require('./seed');
 
 let data = {};
@@ -13,7 +13,7 @@ const getAllTransactions = () => Promise.resolve(data);
 const getSingleTransaction = id => {
   const transact = data[id];
   if (!transact) {
-    return Promise.reject(new DatabaseError('No transaction found.'));
+    return Promise.reject(new DatabaseNotFoundError('No transaction found.'));
   }
   return Promise.resolve(transact);
 };
@@ -36,7 +36,7 @@ const createTransaction = payload => {
 const deleteTransaction = id => {
   const transact = data[id];
   if (!transact) {
-    return Promise.reject(new DatabaseError('No transaction found.'));
+    return Promise.reject(new DatabaseNotFoundError('No transaction found.'));
   }
   delete data[id];
   return Promise.resolve(transact);
