@@ -1,5 +1,8 @@
 const { celebrate } = require('celebrate');
+const conditional = require('express-conditional-middleware');
 const { EntityNotFoundError } = require('../errors');
+const sendResponse = require('../middlewares/sendResponse');
+const shouldRespond = require('../middlewares/shouldRespond');
 const {
   getAllTransactions,
   getSingleTransaction,
@@ -12,14 +15,20 @@ const {
 } = require('../validations/transactionSchema');
 
 module.exports = function(app) {
-  app.get('/transaction', async (req, res, next) => {
-    try {
-      const list = await getAllTransactions();
-      res.json({ success: true, result: toArray(list) });
-    } catch (err) {
-      next(err, req, res);
-    }
-  });
+  app.get(
+    '/transaction',
+    async (req, res, next) => {
+      try {
+        const list = await getAllTransactions();
+        req.state.toRespond = toArray(list);
+        next();
+      } catch (err) {
+        next(err, req, res);
+      }
+    },
+    conditional(shouldRespond, sendResponse)
+  );
+
   app.get(
     '/transaction/:id',
     celebrate({ params: getSingleTransactionSchema }, options),
@@ -29,12 +38,16 @@ module.exports = function(app) {
         if (!transact) {
           throw new EntityNotFoundError('Requested transaction not found.');
         }
-        res.json({ success: true, result: transact });
+
+        req.state.toRespond = transact;
+        next();
       } catch (err) {
         next(err, req, res);
       }
-    }
+    },
+    conditional(shouldRespond, sendResponse)
   );
+
   app.post('/transaction', async (req, res) => {
     res.json({ msg: 'create TR' });
   });
