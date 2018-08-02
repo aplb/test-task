@@ -7,7 +7,7 @@ const {
   getAllTransactions,
   getSingleTransaction,
   createTransaction,
-  // deleteTransaction,
+  deleteTransaction,
 } = require('../db');
 const {
   createTransaction: createTransactionSchema,
@@ -66,20 +66,43 @@ module.exports = function(app) {
     conditional(shouldRespond, sendResponse)
   );
 
-  app.delete('/transaction/:id', async (req, res) => {
-    res.json({ msg: 'DEL ONE TR' });
-  });
+  app.delete(
+    '/transaction/:id',
+    celebrate({ params: getSingleTransactionSchema }, options),
+    // fetch TR we going to delete
+    async (req, res, next) => {
+      try {
+        const transact = await getSingleTransaction(req.params.id);
+        req.state.transact = transact;
+        next();
+      } catch (err) {
+        next(err);
+      }
+    },
+    checkNegativeAmount,
+    async (req, res, next) => {
+      const { id } = req.params;
+      try {
+        const transact = await deleteTransaction(id);
+        req.state.toRespond = { result: transact };
+        next();
+      } catch (err) {
+        next(err);
+      }
+    },
+    conditional(shouldRespond, sendResponse)
+  );
 };
 
 async function checkNegativeAmount(req, res, next) {
-  const { type, amount } = req.body;
-  if (type === 'debit') {
-    return next();
+  const { type, amount } = getTransactionDetailsFromRequest(req);
+  if (shouldPassNegativeBalanceCheck(req, type)) {
+    next();
   }
 
   try {
     const total = await getTotal();
-    if (total - amount < 0) {
+    if (isNextTotalNegative(total, amount, type, req)) {
       return next(new NegativeAmountError());
     }
     next();
@@ -102,3 +125,40 @@ async function getTotal() {
 
 // helpers
 const toArray = table => Object.values(table);
+
+const getTransactionDetailsFromRequest = req => {
+  return req.state.transact || req.body;
+};
+
+const shouldPassNegativeBalanceCheck = (req, trType) => {
+  if (trType === 'debit' && req.method === 'POST') {
+    return true;
+  }
+
+  if (trType === 'credit' && req.method === 'DELETE') {
+    return true;
+  }
+
+  return false;
+};
+
+const isNextTotalNegative = (currTotal, amount, trType, req) => {
+  let sum;
+  if (trType === 'credit') {
+    if (req.method === 'DELETE') {
+      sum = currTotal + amount;
+    }
+    if (req.method === 'POST') {
+      sum = currTotal - amount;
+    }
+  } else {
+    if (req.method === 'DELETE') {
+      sum = currTotal - amount;
+    }
+    if (req.method === 'POST') {
+      sum = currTotal + amount;
+    }
+  }
+
+  return sum < 0;
+};
