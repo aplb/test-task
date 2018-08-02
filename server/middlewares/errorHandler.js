@@ -4,11 +4,8 @@ const { isCelebrate } = require('celebrate');
 module.exports = (err, req, res, next) => {
   if (isCelebrate(err)) {
     res.status(400);
-  } else if (
-    err.name === 'EntityNotFoundError' ||
-    err.name === 'DatabaseNotFoundError'
-  ) {
-    res.status(404);
+  } else if (err.statusCode) {
+    res.status(err.statusCode);
   } else {
     res.status(500);
   }

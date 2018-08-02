@@ -1,6 +1,6 @@
 const { celebrate } = require('celebrate');
 const conditional = require('express-conditional-middleware');
-const { EntityNotFoundError } = require('../errors');
+const { EntityNotFoundError, NegativeAmountError } = require('../errors');
 const sendResponse = require('../middlewares/sendResponse');
 const shouldRespond = require('../middlewares/shouldRespond');
 const {
@@ -52,7 +52,7 @@ module.exports = function(app) {
   app.post(
     '/transaction',
     celebrate({ body: createTransactionSchema }, options),
-    // checkNegativeAmount
+    checkNegativeAmount,
     async (req, res, next) => {
       const payload = req.body;
       try {
@@ -60,7 +60,7 @@ module.exports = function(app) {
         req.state.toRespond = { result: transact, status: 201 };
         next();
       } catch (err) {
-        next(err, req, res);
+        next(err);
       }
     },
     conditional(shouldRespond, sendResponse)
@@ -70,6 +70,35 @@ module.exports = function(app) {
     res.json({ msg: 'DEL ONE TR' });
   });
 };
+
+async function checkNegativeAmount(req, res, next) {
+  const { type, amount } = req.body;
+  if (type === 'debit') {
+    return next();
+  }
+
+  try {
+    const total = await getTotal();
+    if (total - amount < 0) {
+      return next(new NegativeAmountError());
+    }
+    next();
+  } catch (err) {
+    next(err, req, res);
+  }
+}
+
+async function getTotal() {
+  const list = await getAllTransactions();
+  return toArray(list).reduce((acc, tr) => {
+    if (tr.type === 'debit') {
+      acc += tr.amount;
+    } else {
+      acc -= tr.amount;
+    }
+    return acc;
+  }, 0);
+}
 
 // helpers
 const toArray = table => Object.values(table);
