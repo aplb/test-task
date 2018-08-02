@@ -16,4 +16,9 @@ module.exports = {
       .min(validations.transaction.minAmount)
       .max(validations.transaction.maxAmount),
   }),
+  getSingleTransaction: Joi.object().keys({
+    id: Joi.string()
+      .trim()
+      .uuid(),
+  }),
 };

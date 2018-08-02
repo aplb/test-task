@@ -1,6 +1,9 @@
 const Joi = require('joi');
 const { validations } = require('config');
-const { createTransaction } = require('./transactionSchema');
+const {
+  createTransaction,
+  getSingleTransaction,
+} = require('./transactionSchema');
 
 describe('transaction schema', () => {
   let form;
@@ -39,5 +42,20 @@ describe('transaction schema', () => {
   test('should fail above max amount', () => {
     form.amount = validations.transaction.maxAmount + 1;
     expect(Joi.validate(form, createTransaction).error).not.toEqual(null);
+  });
+
+  test('should pass with valid uuid', () => {
+    let params = { id: '97d6a157-5f61-45f5-8543-40f9d67e7fd6' };
+    expect(Joi.validate(params, getSingleTransaction)).toEqual(
+      expect.objectContaining({
+        value: params,
+        error: null,
+      })
+    );
+  });
+
+  test('should fail without params.id as uuid', () => {
+    let params = { id: '5f61-45f5-8543-40f9d67e7fd6' };
+    expect(Joi.validate(params, getSingleTransaction).error).not.toEqual(null);
   });
 });
