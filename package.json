@@ -4,7 +4,7 @@
   "description": "",
   "main": "server/index.js",
   "scripts": {
-    "start:dev": "node ./server/index.js",
+    "start:dev": "NODE_ENV=development node ./server/index.js",
     "test:back": "jest ./server",
     "precommit": "lint-staged"
   },
@@ -17,7 +17,8 @@
     "compose-middleware": "^5.0.0",
     "config": "^2.0.1",
     "express": "^4.16.3",
-    "joi": "^13.5.2"
+    "joi": "^13.5.2",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.6",
