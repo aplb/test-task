@@ -6,7 +6,8 @@
   "scripts": {
     "start:dev": "NODE_ENV=development node ./server/index.js",
     "test:back": "jest ./server",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "lint": "eslint ./server ./config --quiet"
   },
   "keywords": [],
   "author": "",
