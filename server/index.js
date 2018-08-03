@@ -47,6 +47,8 @@ process.on('uncaughtException', err => {
   process.exit(100);
 });
 
-app.listen(server.port, () => {
+app.server = app.listen(server.port, () => {
   logger.info(`App listening on port: ${server.port}.....`, { tags: 'server' });
 });
+
+module.exports = app;
