@@ -101,7 +101,7 @@ module.exports = function(app) {
 async function checkNegativeAmount(req, res, next) {
   const { type, amount } = getTransactionDetailsFromRequest(req);
   if (shouldPassNegativeBalanceCheck(req, type)) {
-    next();
+    return next();
   }
 
   try {
@@ -111,7 +111,7 @@ async function checkNegativeAmount(req, res, next) {
     }
     next();
   } catch (err) {
-    next(err, req, res);
+    next(err);
   }
 }
 
