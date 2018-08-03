@@ -8,6 +8,7 @@ const mockDBInst = {
     Promise.resolve(Object.values(mockData)[0])
   ),
   createTransaction: jest.fn(() => ({})),
+  deleteTransaction: jest.fn(() => Promise.resolve(Object.values(mockData)[0])),
 };
 
 jest.mock('../db', () => mockDBInst);
@@ -84,7 +85,7 @@ describe('transactions', () => {
     });
 
     test('should throw not DatabaseEntityNotFound error', () => {
-      mockDBInst.getSingleTransaction.mockRejectedValue(
+      mockDBInst.getSingleTransaction.mockRejectedValueOnce(
         new DatabaseNotFoundError('No transaction found.')
       );
 
@@ -135,6 +136,52 @@ describe('transactions', () => {
         .send(body)
         .then(res => {
           ensureError(res, 500);
+        });
+    });
+  });
+
+  describe('Transaction: delete', () => {
+    test('should handle transaction not found when deleting', () => {
+      mockDBInst.getSingleTransaction.mockRejectedValueOnce(
+        new DatabaseNotFoundError('No transaction found.')
+      );
+
+      return request(app)
+        .delete('/transaction/97d6a157-5f61-45f5-8543-40f9d67e7fd6')
+        .then(res => {
+          ensureError(res, 404, 'No transaction found.');
+        });
+    });
+
+    test('should bypass checks and delete `credit` transaction', () => {
+      return request(app)
+        .delete('/transaction/97d6a157-5f61-45f5-8543-40f9d67e7fd6')
+        .then(res => {
+          ensureSuccess(res);
+          expect(res.body.result).toEqual(
+            expect.objectContaining({
+              id: '97d6a157-5f61-45f5-8543-40f9d67e7fd6',
+              type: 'credit',
+              amount: 100,
+            })
+          );
+        });
+    });
+
+    test('should fail when deleting `debit` leads to negative balance', () => {
+      // params.id should be 800 when total is 500
+      mockDBInst.getSingleTransaction.mockResolvedValueOnce(
+        Object.values(mockData)[7]
+      );
+
+      return request(app)
+        .delete('/transaction/d50c124b-2d07-4451-a486-328881c9f52a')
+        .then(res => {
+          ensureError(
+            res,
+            400,
+            'Transaction should not produce a negative balance.'
+          );
         });
     });
   });

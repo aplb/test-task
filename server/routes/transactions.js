@@ -88,7 +88,7 @@ module.exports = function(app) {
       const { id } = req.params;
       try {
         const transact = await deleteTransaction(id);
-        req.state.toRespond = { result: transact };
+        req.state.toRespond = transact;
         next();
       } catch (err) {
         next(err);
