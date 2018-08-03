@@ -5,6 +5,9 @@
   "main": "server/index.js",
   "scripts": {
     "start:dev": "NODE_ENV=development node ./server/index.js",
+    "build": "npm run build --prefix client",
+    "build:dev": "npm run start --prefix client",
+    "dev": "concurrently \"npm run start:dev\" \"npm run build:dev\"",
     "test:back": "jest ./server",
     "precommit": "lint-staged",
     "lint": "eslint ./server ./config --quiet"
@@ -26,6 +29,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^8.2.6",
+    "concurrently": "^3.6.1",
     "eslint": "^5.2.0",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-config-prettier": "^2.9.0",
@@ -48,7 +52,7 @@
   },
   "lint-staged": {
     "*.js": [
-      "eslint --fix",
+      "eslint --fix --ignore-pattern=client/src/*",
       "git add"
     ]
   },
