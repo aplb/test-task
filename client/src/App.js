@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 
+// may be useful
+// https://github.com/mui-org/material-ui/blob/dd45ebaa3fa9277c66d83d978da2e113261db458/docs/src/app/components/CodeExample/CodeBlock.js
+
 class App extends Component {
   componentDidMount() {
     fetch('/transaction')
