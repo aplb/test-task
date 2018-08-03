@@ -1,9 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const expressWinston = require('express-winston');
+// const redis = require('redis');
 const { server } = require('config');
 const errorHandler = require('./middlewares/errorHandler');
 const logger = require('./logger');
+
+/*
+const client = redis.createClient({
+  host: 'redis', // MACOS only??
+});
+
+client.set('key', 'val', (err, res) => {
+  console.log('----------', err, res);
+  client.get('key', console.log)
+})
+*/
 
 const app = express();
 app.use(bodyParser.json());
