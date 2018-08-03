@@ -21,7 +21,11 @@ module.exports = function(app) {
     async (req, res, next) => {
       try {
         const list = await getAllTransactions();
-        req.state.toRespond = toArray(list);
+        if (list) {
+          req.state.toRespond = toArray(list);
+        } else {
+          req.state.toRespond = [];
+        }
         next();
       } catch (err) {
         next(err, req, res);
