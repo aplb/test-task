@@ -64,24 +64,27 @@ describe('transactions', () => {
 
   describe('Transaction: get one', () => {
     test('should return single transaction', () => {
+      const id = '97d6a157-5f61-45f5-8543-40f9d67e7fd6';
+
       return request(app)
-        .get('/transaction/97d6a157-5f61-45f5-8543-40f9d67e7fd6')
+        .get(`/transaction/${id}`)
         .expect('Content-Type', /json/)
         .then(res => {
           ensureSuccess(res);
-          expect(mockDBInst.getSingleTransaction).toHaveBeenCalled();
+          expect(mockDBInst.getSingleTransaction).toHaveBeenCalledWith(id);
           expect(res.body.result).toBeTruthy();
         });
     });
 
     test('should throw not EntityNotFound error', () => {
       mockDBInst.getSingleTransaction.mockResolvedValue(null);
+      const id = '97d6a157-5f61-45f5-8543-40f9d67e7fd6';
 
       return request(app)
-        .get('/transaction/97d6a157-5f61-45f5-8543-40f9d67e7fd6')
+        .get(`/transaction/${id}`)
         .then(res => {
           ensureError(res, 404, 'Requested transaction not found.');
-          expect(mockDBInst.getSingleTransaction).toHaveBeenCalled();
+          expect(mockDBInst.getSingleTransaction).toHaveBeenCalledWith(id);
         });
     });
 
@@ -89,12 +92,13 @@ describe('transactions', () => {
       mockDBInst.getSingleTransaction.mockRejectedValueOnce(
         new DatabaseNotFoundError('No transaction found.')
       );
+      const id = '97d6a157-5f61-45f5-8543-40f9d67e7fd6';
 
       return request(app)
-        .get('/transaction/97d6a157-5f61-45f5-8543-40f9d67e7fd6')
+        .get(`/transaction/${id}`)
         .then(res => {
           ensureError(res, 404, 'No transaction found.');
-          expect(mockDBInst.getSingleTransaction).toHaveBeenCalled();
+          expect(mockDBInst.getSingleTransaction).toHaveBeenCalledWith(id);
         });
     });
   });
@@ -109,6 +113,7 @@ describe('transactions', () => {
         .send(body)
         .then(res => {
           ensureSuccess(res, 201);
+          expect(mockDBInst.createTransaction).toHaveBeenCalledWith(body);
           expect(res.body.result).toEqual(expect.objectContaining(body));
         });
     });
@@ -155,13 +160,17 @@ describe('transactions', () => {
     });
 
     test('should bypass checks and delete `credit` transaction', () => {
+      const id = '97d6a157-5f61-45f5-8543-40f9d67e7fd6';
+
       return request(app)
-        .delete('/transaction/97d6a157-5f61-45f5-8543-40f9d67e7fd6')
+        .delete(`/transaction/${id}`)
         .then(res => {
           ensureSuccess(res);
+          expect(mockDBInst.deleteTransaction).toHaveBeenCalledWith(id);
+
           expect(res.body.result).toEqual(
             expect.objectContaining({
-              id: '97d6a157-5f61-45f5-8543-40f9d67e7fd6',
+              id,
               type: 'credit',
               amount: 100,
             })
@@ -170,7 +179,7 @@ describe('transactions', () => {
     });
 
     test('should fail when deleting `debit` leads to negative balance', () => {
-      // params.id should be 800 when total is 500
+      // params.id => should be 800 when total is 500
       mockDBInst.getSingleTransaction.mockResolvedValueOnce(
         Object.values(mockData)[7]
       );
