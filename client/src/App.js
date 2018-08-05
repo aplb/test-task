@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import AppBar from './components/AppBar';
 import Transactions from './components/Transactions/ListContainer';
 
@@ -14,10 +15,10 @@ class App extends Component {
   }
   render() {
     return (
-      <div>
+      <MuiThemeProvider theme={createMuiTheme({})}>
         <AppBar />
         <Transactions />
-      </div>
+      </MuiThemeProvider>
     );
   }
 }
