@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import format from 'date-fns/format';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import Loader from '../Loader';
-// import moment from 'momentjs'
 
 const TransactionDetails = ({ transact, isLoading, bgColor }) => {
   if (isLoading) {
@@ -17,7 +17,7 @@ const TransactionDetails = ({ transact, isLoading, bgColor }) => {
     <ExpansionPanelDetails style={{ flexDirection: 'column', backgroundColor: bgColor }}>
       <Typography>Type: {transact.type}</Typography>
       <Typography>Amount: {transact.amount}</Typography>
-      <Typography>Date: {transact.effectiveDate}</Typography>
+      <Typography>Date: {format(transact.effectiveDate, 'YYYY-MM-DD HH:mm')}</Typography>
     </ExpansionPanelDetails>
   );
 };
