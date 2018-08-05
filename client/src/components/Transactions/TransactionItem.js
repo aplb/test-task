@@ -19,20 +19,20 @@ const styles = theme => ({
   secondaryHeading: {
     fontSize: theme.typography.pxToRem(15),
     color: theme.palette.text.secondary,
+    textTransform: 'capitalize',
   },
 });
 
 class ControlledExpansionPanels extends Component {
   render() {
     const { handleExpandChange, classes, transaction, expandedId } = this.props;
-    // const { expanded } = this.state;
 
     return (
       <div className={classes.root}>
         <ExpansionPanel expanded={transaction.id === expandedId} onChange={handleExpandChange}>
           <ExpansionPanelSummary expandIcon={f => f}>
-            <Typography className={classes.heading}>General settings</Typography>
-            <Typography className={classes.secondaryHeading}>I am an expansion panel</Typography>
+            <Typography className={classes.heading}># {transaction.id}</Typography>
+            <Typography className={classes.secondaryHeading}>{transaction.type}: {transaction.amount}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Typography>
@@ -49,6 +49,8 @@ class ControlledExpansionPanels extends Component {
 ControlledExpansionPanels.propTypes = {
   classes: PropTypes.object.isRequired,
   handleExpandChange: PropTypes.func.isRequired,
+  expanded: PropTypes.number.isRequired,
+  transaction: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(ControlledExpansionPanels);

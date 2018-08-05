@@ -1,4 +1,4 @@
-import { put, all, take, call } from 'redux-saga/effects';
+import { put, all, take, call, select } from 'redux-saga/effects';
 import { createSelector } from 'reselect';
 import api from '../api';
 
@@ -50,7 +50,9 @@ export default function reducer(state = initialState, action) {
     }
     case GET_TRANSACTION_RESOLVED: {
       const newState = { ...state };
-      newState.data = action.data;
+      newState.data = action.payload;
+      newState.cached = { ...state.cached };
+      newState.cached[action.payload.id] = action.payload;
       newState.isLoading = false;
       newState.isFinished = true;
       return newState;
@@ -74,6 +76,7 @@ const stateSelector = state => state.transaction;
 export const transactionListSelector = createSelector(stateSelector, state => state.queryResult || []);
 export const transactionSelector = createSelector(stateSelector, state => state.data);
 export const isLoadingSelector = createSelector(stateSelector, state => state.isLoading);
+const cachedTransactionsSelector = createSelector(stateSelector, state => state.cached);
 
 // Action creators
 export const fetchTransactions = () => ({
@@ -89,10 +92,9 @@ export const getTransaction = id => ({
 
 function * fetchTransactionsSaga() {
   while (true) {
-    // console.log('-----------', 'here')
     yield take(FETCH_TRANSACTIONS);
-    // console.log('-----------', 'here')
     yield put({
+
       type: FETCH_TRANSACTIONS_PENDING,
     });
 
@@ -116,7 +118,16 @@ function * getTransactionSaga() {
     const { payload } = yield take(GET_TRANSACTION);
 
     try {
-      const { result } = yield call([api, api.getTransaction], payload.id);
+      const cached = yield select(cachedTransactionsSelector);
+      let result;
+
+      if (cached[payload.id]) {
+        result = cached[payload.id];
+      } else {
+        const callRes = yield call([api, api.getTransaction], payload.id);
+        result = callRes.result;
+      }
+
       yield put({
         type: GET_TRANSACTION_RESOLVED,
         payload: result,

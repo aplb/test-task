@@ -8,16 +8,19 @@ export default class TransactionsList extends Component {
     expanded: null,
   };
 
-  handleExpandChange = panel => (event, expanded) => {
+  handleExpandChange = panelId => (event, expanded) => {
+    if (expanded) {
+      this.props.getTransaction(panelId);
+    }
     this.setState({
-      expanded: expanded ? panel : false,
+      expanded: expanded ? panelId : false,
     });
   };
 
   componentWillMount() {
     this.props.fetchTransactions();
-    // this.props.getTransaction('97d6a157-5f61-45f5-8543-40f9d67e7fd6');
   }
+
   render() {
     const { expanded } = this.state;
     const { transactionsList, isLoading } = this.props;
