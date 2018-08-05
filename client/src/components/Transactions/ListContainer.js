@@ -9,9 +9,9 @@ import {
 } from '../../ducks/transaction';
 
 const mapStateToProps = state => ({
-  transactionList: transactionListSelector(state),
+  transactionsList: transactionListSelector(state),
   transaction: transactionSelector(state),
-  isLoadingSelector: isLoadingSelector(state),
+  isLoading: isLoadingSelector(state),
 });
 
 export default connect(mapStateToProps, {

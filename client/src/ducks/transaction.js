@@ -15,7 +15,7 @@ export const GET_TRANSACTION_REJECTED = `${moduleName}/GET_TRANSACTION_REJECTED`
 
 // Reducer
 const initialState = {
-  queryResult: [],
+  queryResult: null,
   data: {},
   isLoading: false,
   isFinished: false,
@@ -71,7 +71,7 @@ export default function reducer(state = initialState, action) {
 
 // Selectors
 const stateSelector = state => state.transaction;
-export const transactionListSelector = createSelector(stateSelector, state => state.queryResult);
+export const transactionListSelector = createSelector(stateSelector, state => state.queryResult || []);
 export const transactionSelector = createSelector(stateSelector, state => state.data);
 export const isLoadingSelector = createSelector(stateSelector, state => state.isLoading);
 
