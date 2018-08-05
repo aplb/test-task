@@ -12,6 +12,8 @@ const mockDBInst = {
   deleteTransaction: jest.fn(() => Promise.resolve(Object.values(mockData)[0])),
 };
 
+// we mock fake database =))
+// in order to manipulate DB behaviour
 jest.mock('../db', () => mockDBInst);
 
 describe('transactions', () => {

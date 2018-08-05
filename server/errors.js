@@ -1,7 +1,7 @@
 class DatabaseError extends Error {
   constructor(message) {
     super();
-    this.type = 'AppError';
+    this.type = 'DatabaseError';
     this.name = 'DatabaseError';
     this.message = message;
   }
@@ -37,9 +37,19 @@ class NegativeAmountError extends Error {
   }
 }
 
+class DatabaseTableLockedError extends Error {
+  constructor() {
+    super();
+    this.type = 'DatabaseError';
+    this.name = 'DatabaseTableLockedError';
+    this.message = 'Table is locked.';
+  }
+}
+
 module.exports = {
   DatabaseError,
   DatabaseNotFoundError,
   EntityNotFoundError,
   NegativeAmountError,
+  DatabaseTableLockedError,
 };

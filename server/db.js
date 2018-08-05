@@ -1,5 +1,5 @@
 const uuid = require('uuid/v4');
-const { DatabaseNotFoundError } = require('./errors');
+const { DatabaseNotFoundError, DatabaseTableLockedError } = require('./errors');
 const seed = require('./seed');
 
 let data = {};
@@ -8,18 +8,27 @@ if (process.env.NODE_ENV === 'development') {
   data = seed;
 }
 
-const getAllTransactions = () => Promise.resolve(data);
+const getAllTransactions = () =>
+  new Promise(resolve => {
+    setTimeout(() => {
+      resolve(data);
+    }, 1000);
+  });
 
 const getSingleTransaction = id => {
   const transact = data[id];
   if (!transact) {
     return Promise.reject(new DatabaseNotFoundError('No transaction found.'));
   }
-  return Promise.resolve(transact);
+  // return Promise.resolve(transact);
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(transact);
+    }, 1000);
+  });
 };
 
 const createTransaction = payload => {
-  // withLock
   const transact = Object.assign(
     {},
     {
@@ -42,9 +51,25 @@ const deleteTransaction = id => {
   return Promise.resolve(transact);
 };
 
+let locked = false;
+
+const withLock = fn => (...args) => {
+  if (locked) {
+    throw new DatabaseTableLockedError();
+  }
+  locked = true;
+  try {
+    return fn(...args);
+  } catch (err) {
+    throw err;
+  } finally {
+    locked = false;
+  }
+};
+
 module.exports = {
-  getAllTransactions,
-  getSingleTransaction,
-  createTransaction,
-  deleteTransaction,
+  getAllTransactions: withLock(getAllTransactions),
+  getSingleTransaction: withLock(getSingleTransaction),
+  createTransaction: withLock(createTransaction),
+  deleteTransaction: withLock(deleteTransaction),
 };

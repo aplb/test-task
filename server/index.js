@@ -32,7 +32,6 @@ app.use(
 );
 
 require('./routes/transactions')(app);
-// require('./routes/account')(app);
 
 app.get('/', (req, res) => {
   res.json({ ok: true });
