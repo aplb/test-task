@@ -23,7 +23,7 @@ export default class TransactionsList extends Component {
 
   render() {
     const { expanded } = this.state;
-    const { transactionFullData, lastLoading, transactionsList, isLoading } = this.props;
+    const { error, transactionFullData, lastLoading, transactionsList, isLoading } = this.props;
 
     if (!lastLoading && isLoading) {
       return (<Loader />);
@@ -31,7 +31,7 @@ export default class TransactionsList extends Component {
 
     return (
       <div>
-        {/* <div>error</div> */}
+        <div>{error}</div>
         {transactionsList.map(
           transaction =>
             <TransactionItem
@@ -55,4 +55,5 @@ TransactionsList.propTypes = {
   fetchTransactions: PropTypes.func.isRequired,
   lastLoading: PropTypes.string,
   transactionFullData: PropTypes.object,
+  error: PropTypes.string,
 };

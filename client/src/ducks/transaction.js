@@ -82,6 +82,7 @@ export const transactionSelector = createSelector(stateSelector, state => state.
 export const isLoadingSelector = createSelector(stateSelector, state => state.isLoading);
 const cachedTransactionsSelector = createSelector(stateSelector, state => state.cached);
 export const lastLoadingSelector = createSelector(stateSelector, state => state.lastLoading);
+export const getErrorSelector = createSelector(stateSelector, state => state.isError);
 
 // Action creators
 export const fetchTransactions = () => ({
@@ -103,7 +104,17 @@ function * fetchTransactionsSaga() {
     });
 
     try {
-      const { result } = yield call([api, api.fetchTransactions]);
+      const callResult = yield call([api, api.fetchTransactions]);
+
+      if (!callResult.success) {
+        yield put({
+          type: FETCH_TRANSACTIONS_REJECTED,
+          error: callResult.message,
+        });
+        return;
+      }
+      const { result } = callResult;
+
       yield put({
         type: FETCH_TRANSACTIONS_RESOLVED,
         payload: result,
@@ -112,7 +123,7 @@ function * fetchTransactionsSaga() {
       yield put({
         type: FETCH_TRANSACTIONS_REJECTED,
         error: err,
-      })
+      });
     }
   }
 }
@@ -128,13 +139,23 @@ function * getTransactionSaga() {
     try {
       const cached = yield select(cachedTransactionsSelector);
       let result;
+      let callResult;
 
       if (cached[payload.id]) {
         result = cached[payload.id];
       } else {
-        const callRes = yield call([api, api.getTransaction], payload.id);
-        result = callRes.result;
+        callResult = yield call([api, api.getTransaction], payload.id);
       }
+
+      if (!callResult.success) {
+        yield put({
+          type: GET_TRANSACTION_REJECTED,
+          error: callResult.message,
+        });
+        return;
+      }
+
+      result = callResult.result;
 
       yield put({
         type: GET_TRANSACTION_RESOLVED,
@@ -144,7 +165,7 @@ function * getTransactionSaga() {
       yield put({
         type: GET_TRANSACTION_REJECTED,
         error: err,
-      })
+      });
     }
   }
 }

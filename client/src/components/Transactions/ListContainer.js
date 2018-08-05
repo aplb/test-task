@@ -7,6 +7,7 @@ import {
   transactionSelector,
   isLoadingSelector,
   lastLoadingSelector,
+  getErrorSelector,
 } from '../../ducks/transaction';
 
 const mapStateToProps = state => ({
@@ -15,6 +16,7 @@ const mapStateToProps = state => ({
   isLoading: isLoadingSelector(state),
   lastLoading: lastLoadingSelector(state),
   transactionFullData: transactionSelector(state),
+  error: getErrorSelector(state),
 });
 
 export default connect(mapStateToProps, {
