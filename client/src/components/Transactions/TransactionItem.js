@@ -6,6 +6,7 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import Typography from '@material-ui/core/Typography';
 import TransactionDetails from './TransactionDetails';
 // import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { getPrimaryTransactionColor, getSecondaryTransactionColor } from '../colorUtils';
 
 const styles = theme => ({
   root: {
@@ -36,12 +37,20 @@ class ControlledExpansionPanels extends Component {
 
     return (
       <div className={classes.root}>
-        <ExpansionPanel expanded={transaction.id === expandedId} onChange={handleExpandChange}>
+        <ExpansionPanel
+          expanded={transaction.id === expandedId}
+          onChange={handleExpandChange}
+          style={{ backgroundColor: getPrimaryTransactionColor(transaction) }}
+        >
           <ExpansionPanelSummary expandIcon={f => f}>
             <Typography className={classes.heading}># {transaction.id}</Typography>
             <Typography className={classes.secondaryHeading}>{transaction.type}: {transaction.amount}</Typography>
           </ExpansionPanelSummary>
-          <TransactionDetails isLoading={isLoading} transact={transactionFullData} />
+          <TransactionDetails
+            isLoading={isLoading}
+            transact={transactionFullData}
+            bgColor={getSecondaryTransactionColor(transaction)}
+          />
         </ExpansionPanel>
       </div>
     );

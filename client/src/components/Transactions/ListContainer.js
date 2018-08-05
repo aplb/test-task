@@ -14,7 +14,7 @@ const mapStateToProps = state => ({
   transaction: transactionSelector(state),
   isLoading: isLoadingSelector(state),
   lastLoading: lastLoadingSelector(state),
-  transactionFullData: getTransaction(state),
+  transactionFullData: transactionSelector(state),
 });
 
 export default connect(mapStateToProps, {
