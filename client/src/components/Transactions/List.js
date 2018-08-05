@@ -31,7 +31,7 @@ export default class TransactionsList extends Component {
 
     return (
       <div>
-        <div>{error}</div>
+        {error && <div>{error}</div>}
         {transactionsList.map(
           transaction =>
             <TransactionItem

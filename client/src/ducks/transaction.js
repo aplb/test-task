@@ -83,6 +83,17 @@ export const isLoadingSelector = createSelector(stateSelector, state => state.is
 const cachedTransactionsSelector = createSelector(stateSelector, state => state.cached);
 export const lastLoadingSelector = createSelector(stateSelector, state => state.lastLoading);
 export const getErrorSelector = createSelector(stateSelector, state => state.isError);
+export const totalSelector = createSelector(
+  stateSelector,
+  transactionListSelector,
+  (state, list) => list.reduce((acc, tr) => {
+    if (tr.type === 'debit') {
+      acc += tr.amount;
+    } else {
+      acc -= tr.amount;
+    }
+    return acc;
+  }, 0));
 
 // Action creators
 export const fetchTransactions = () => ({
@@ -111,6 +122,7 @@ function * fetchTransactionsSaga() {
           type: FETCH_TRANSACTIONS_REJECTED,
           error: callResult.message,
         });
+        // TODO
         return;
       }
       const { result } = callResult;
@@ -143,24 +155,29 @@ function * getTransactionSaga() {
 
       if (cached[payload.id]) {
         result = cached[payload.id];
+
+        yield put({
+          type: GET_TRANSACTION_RESOLVED,
+          payload: result,
+        });
       } else {
         callResult = yield call([api, api.getTransaction], payload.id);
+
+        if (!callResult.success) {
+          yield put({
+            type: GET_TRANSACTION_REJECTED,
+            error: callResult.message,
+          });
+        } else {
+          result = callResult.result;
+
+          yield put({
+            type: GET_TRANSACTION_RESOLVED,
+            payload: result,
+          });
+        }
       }
 
-      if (!callResult.success) {
-        yield put({
-          type: GET_TRANSACTION_REJECTED,
-          error: callResult.message,
-        });
-        return;
-      }
-
-      result = callResult.result;
-
-      yield put({
-        type: GET_TRANSACTION_RESOLVED,
-        payload: result,
-      })
     } catch (err) {
       yield put({
         type: GET_TRANSACTION_REJECTED,

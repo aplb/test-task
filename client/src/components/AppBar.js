@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import { totalSelector } from '../ducks/transaction';
 
 const styles = {
   root: {
@@ -12,13 +15,13 @@ const styles = {
 };
 
 function HeaderAppBar(props) {
-  const { classes } = props;
+  const { classes, total } = props;
   return (
     <div className={classes.root}>
       <AppBar position="static" color="default">
         <Toolbar>
           <Typography variant="title" color="inherit">
-            Transactions
+            Transactions | total: {total}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -30,4 +33,11 @@ HeaderAppBar.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(HeaderAppBar);
+const mapStateToProps = state => ({
+  total: totalSelector(state),
+});
+
+export default compose(
+  connect(mapStateToProps),
+  withStyles(styles)
+)(HeaderAppBar);
