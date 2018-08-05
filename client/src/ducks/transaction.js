@@ -21,6 +21,7 @@ const initialState = {
   isFinished: false,
   isError: false,
   cached: {},
+  lastLoading: null,
 };
 
 export default function reducer(state = initialState, action) {
@@ -44,12 +45,14 @@ export default function reducer(state = initialState, action) {
     case GET_TRANSACTION_PENDING: {
       const newState = { ...state };
       newState.data = null;
-      newState.isLoading = false;
+      newState.lastLoading = action.payload.id;
+      newState.isLoading = true;
       newState.isFinished = true;
       return newState;
     }
     case GET_TRANSACTION_RESOLVED: {
       const newState = { ...state };
+      newState.lastLoading = null;
       newState.data = action.payload;
       newState.cached = { ...state.cached };
       newState.cached[action.payload.id] = action.payload;
@@ -60,6 +63,7 @@ export default function reducer(state = initialState, action) {
     case FETCH_TRANSACTIONS_REJECTED:
     case GET_TRANSACTION_REJECTED: {
       const newState = { ...state };
+      newState.lastLoading = null;
       newState.isLoading = false;
       newState.isFinished = true;
       newState.isError = action.error;
@@ -77,6 +81,7 @@ export const transactionListSelector = createSelector(stateSelector, state => st
 export const transactionSelector = createSelector(stateSelector, state => state.data);
 export const isLoadingSelector = createSelector(stateSelector, state => state.isLoading);
 const cachedTransactionsSelector = createSelector(stateSelector, state => state.cached);
+export const lastLoadingSelector = createSelector(stateSelector, state => state.lastLoading);
 
 // Action creators
 export const fetchTransactions = () => ({
@@ -94,7 +99,6 @@ function * fetchTransactionsSaga() {
   while (true) {
     yield take(FETCH_TRANSACTIONS);
     yield put({
-
       type: FETCH_TRANSACTIONS_PENDING,
     });
 
@@ -116,6 +120,10 @@ function * fetchTransactionsSaga() {
 function * getTransactionSaga() {
   while (true) {
     const { payload } = yield take(GET_TRANSACTION);
+    yield put({
+      type: GET_TRANSACTION_PENDING,
+      payload: { id: payload.id },
+    });
 
     try {
       const cached = yield select(cachedTransactionsSelector);

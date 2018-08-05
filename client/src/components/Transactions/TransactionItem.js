@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import Typography from '@material-ui/core/Typography';
+import TransactionDetails from './TransactionDetails';
 // import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const styles = theme => ({
@@ -25,7 +25,14 @@ const styles = theme => ({
 
 class ControlledExpansionPanels extends Component {
   render() {
-    const { handleExpandChange, classes, transaction, expandedId } = this.props;
+    const {
+      handleExpandChange,
+      classes,
+      transaction,
+       expandedId,
+       isLoading,
+       transactionFullData,
+    } = this.props;
 
     return (
       <div className={classes.root}>
@@ -34,12 +41,7 @@ class ControlledExpansionPanels extends Component {
             <Typography className={classes.heading}># {transaction.id}</Typography>
             <Typography className={classes.secondaryHeading}>{transaction.type}: {transaction.amount}</Typography>
           </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <Typography>
-              Nulla facilisi. Phasellus sollicitudin nulla et quam mattis feugiat. Aliquam eget
-              maximus est, id dignissim quam.
-            </Typography>
-          </ExpansionPanelDetails>
+          <TransactionDetails isLoading={isLoading} transact={transactionFullData} />
         </ExpansionPanel>
       </div>
     );
@@ -51,6 +53,8 @@ ControlledExpansionPanels.propTypes = {
   handleExpandChange: PropTypes.func.isRequired,
   expanded: PropTypes.number.isRequired,
   transaction: PropTypes.object.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  transactionFullData: PropTypes.object,
 };
 
 export default withStyles(styles)(ControlledExpansionPanels);

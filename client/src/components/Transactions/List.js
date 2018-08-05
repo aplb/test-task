@@ -23,21 +23,28 @@ export default class TransactionsList extends Component {
 
   render() {
     const { expanded } = this.state;
-    const { transactionsList, isLoading } = this.props;
+    const { transactionFullData, lastLoading, transactionsList, isLoading } = this.props;
 
-    if (isLoading) {
+    if (!lastLoading && isLoading) {
       return (<Loader />);
     }
 
-    return transactionsList.map(
-      transaction =>
-        <TransactionItem
-          key={transaction.id}
-          transaction={transaction}
-          handleExpandChange={this.handleExpandChange(transaction.id)}
-          expandedId={expanded}
-        />
-    );
+    return (
+      <div>
+        {/* <div>error</div> */}
+        {transactionsList.map(
+          transaction =>
+            <TransactionItem
+              key={transaction.id}
+              transaction={transaction}
+              handleExpandChange={this.handleExpandChange(transaction.id)}
+              expandedId={expanded}
+              isLoading={lastLoading === transaction.id} // lodash.memoize
+              transactionFullData={transactionFullData}
+            />
+        )}
+      </div>
+    )
   }
 }
 
@@ -46,4 +53,6 @@ TransactionsList.propTypes = {
   transaction: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
   fetchTransactions: PropTypes.func.isRequired,
+  lastLoading: PropTypes.string,
+  transactionFullData: PropTypes.object,
 };
