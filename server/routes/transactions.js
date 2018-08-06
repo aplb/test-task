@@ -14,11 +14,15 @@ const {
   getSingleTransaction: getSingleTransactionSchema,
   options,
 } = require('../validations/transactionSchema');
-// const useCache = require('../middlewares/useCache');
+const useCache = require('../middlewares/useCache');
+const fromCache = require('../middlewares/fromCache');
+const cleanCache = require('../middlewares/cleanCache');
 
 module.exports = function(app) {
   app.get(
     '/transaction',
+    fromCache({ key: 'transactions' }),
+    conditional(shouldRespond, sendResponse),
     async (req, res, next) => {
       try {
         const list = await getAllTransactions();
@@ -32,6 +36,7 @@ module.exports = function(app) {
         next(err, req, res);
       }
     },
+    conditional(shouldRespond, useCache({ key: 'transactions' })),
     conditional(shouldRespond, sendResponse)
   );
 
@@ -68,6 +73,7 @@ module.exports = function(app) {
         next(err);
       }
     },
+    cleanCache({ key: 'transactions' }),
     conditional(shouldRespond, sendResponse)
   );
 

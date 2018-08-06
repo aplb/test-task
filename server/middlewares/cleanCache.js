@@ -1,8 +1,8 @@
-const { setKey } = require('../services/cache');
+const { delKey } = require('../services/cache');
 
 module.exports = (options = {}) => async (req, res, next) => {
   try {
-    await setKey(options.key || '', req.state.toRespond);
+    await delKey(options.key);
     next();
   } catch (err) {
     next(err);

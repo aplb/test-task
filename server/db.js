@@ -2,11 +2,7 @@ const uuid = require('uuid/v4');
 const { DatabaseNotFoundError, DatabaseTableLockedError } = require('./errors');
 const seed = require('./seed');
 
-let data = {};
-
-if (process.env.NODE_ENV === 'development') {
-  data = seed;
-}
+let data = seed;
 
 const getAllTransactions = () =>
   new Promise(resolve => {

@@ -11,4 +11,7 @@ module.exports = {
   logs: {
     logLevel: 'silly',
   },
+  cache: {
+    ttl: 100,
+  },
 };
