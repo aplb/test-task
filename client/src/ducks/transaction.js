@@ -77,23 +77,25 @@ export default function reducer(state = initialState, action) {
 
 // Selectors
 const stateSelector = state => state.transaction;
-export const transactionListSelector = createSelector(stateSelector, state => state.queryResult || []);
+export const transactionListSelector = createSelector(
+  stateSelector,
+  state => state.queryResult || []
+);
 export const transactionSelector = createSelector(stateSelector, state => state.data);
 export const isLoadingSelector = createSelector(stateSelector, state => state.isLoading);
 const cachedTransactionsSelector = createSelector(stateSelector, state => state.cached);
 export const lastLoadingSelector = createSelector(stateSelector, state => state.lastLoading);
 export const getErrorSelector = createSelector(stateSelector, state => state.isError);
-export const totalSelector = createSelector(
-  stateSelector,
-  transactionListSelector,
-  (state, list) => list.reduce((acc, tr) => {
+export const totalSelector = createSelector(stateSelector, transactionListSelector, (state, list) =>
+  list.reduce((acc, tr) => {
     if (tr.type === 'debit') {
       acc += tr.amount;
     } else {
       acc -= tr.amount;
     }
     return acc;
-  }, 0));
+  }, 0)
+);
 
 // Action creators
 export const fetchTransactions = () => ({
@@ -107,7 +109,7 @@ export const getTransaction = id => ({
 
 // Sagas
 
-function * fetchTransactionsSaga() {
+function* fetchTransactionsSaga() {
   while (true) {
     yield take(FETCH_TRANSACTIONS);
     yield put({
@@ -122,15 +124,14 @@ function * fetchTransactionsSaga() {
           type: FETCH_TRANSACTIONS_REJECTED,
           error: callResult.message,
         });
-        // TODO
-        return;
-      }
-      const { result } = callResult;
+      } else {
+        const { result } = callResult;
 
-      yield put({
-        type: FETCH_TRANSACTIONS_RESOLVED,
-        payload: result,
-      })
+        yield put({
+          type: FETCH_TRANSACTIONS_RESOLVED,
+          payload: result,
+        });
+      }
     } catch (err) {
       yield put({
         type: FETCH_TRANSACTIONS_REJECTED,
@@ -140,7 +141,7 @@ function * fetchTransactionsSaga() {
   }
 }
 
-function * getTransactionSaga() {
+function* getTransactionSaga() {
   while (true) {
     const { payload } = yield take(GET_TRANSACTION);
     yield put({
@@ -177,7 +178,6 @@ function * getTransactionSaga() {
           });
         }
       }
-
     } catch (err) {
       yield put({
         type: GET_TRANSACTION_REJECTED,
@@ -187,9 +187,6 @@ function * getTransactionSaga() {
   }
 }
 
-export function * saga() {
-  yield all([
-    fetchTransactionsSaga(),
-    getTransactionSaga(),
-  ])
+export function* saga() {
+  yield all([fetchTransactionsSaga(), getTransactionSaga()]);
 }
