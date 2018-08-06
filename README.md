@@ -1,15 +1,15 @@
 # Test-task
-<p>Frontend application available at: ubuntu@ec2-18-204-222-194.compute-1.amazonaws.com:8080</p>
-<p>API application available at: ubuntu@ec2-18-204-222-194.compute-1.amazonaws.com:3000</p>
+<p>Frontend application available at: http://ec2-18-204-222-194.compute-1.amazonaws.com:8080</p>
+<p>API application available at: http://ec2-18-204-222-194.compute-1.amazonaws.com:3000</p>
 
 ## API
-<p>GET /transactions</p>
-<p>GET /transactions/id</p>
-<p>POST /transactions</p>
-<p>DELETE /transactions/id</p>
+<p>GET /transaction</p>
+<p>GET /transaction/id</p>
+<p>POST /transaction</p>
+<p>DELETE /transaction/id</p>
 
 ### Run
-From prject root:
+From project root:
 ```bash
 ./scripts/start.sh
 ```
